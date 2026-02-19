@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const MONGODB_URI = 'mongodb+srv://jojo:JOSHUAAJA@budget-tracker-cluster.uqrazoi.mongodb.net/?appName=budget-tracker-cluster';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://jojo:JOSHUAAJA@budget-tracker-cluster.uqrazoi.mongodb.net/?appName=budget-tracker-cluster';
 
 mongoose.connect(MONGODB_URI)
     .then(() => console.log('Connected to MongoDB!'))
