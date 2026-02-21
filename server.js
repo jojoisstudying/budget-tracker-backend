@@ -260,7 +260,7 @@ app.post('/api/ai', authenticateToken, async (req, res) => {
         const { messages } = req.body;
         
         const payload = JSON.stringify({
-            model: 'openai/gpt-4o-mini',
+            model: 'gpt-4o-mini',
             messages: messages,
             temperature: 0.7,
             max_tokens: 800
