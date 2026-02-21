@@ -253,26 +253,49 @@ app.delete('/api/projects/:projectId/transactions/:transactionId', authenticateT
 });
 
 // AI ROUTE
+const https = require('https');
+
 app.post('/api/ai', authenticateToken, async (req, res) => {
     try {
         const { messages } = req.body;
+        
+        const payload = JSON.stringify({
+            model: 'openai/gpt-4o-mini',
+            messages: messages,
+            temperature: 0.7,
+            max_tokens: 800
+        });
 
-        const response = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+        const options = {
+            hostname: 'models.inference.ai.azure.com',
+            path: '/chat/completions',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`
-            },
-            body: JSON.stringify({
-                model: 'openai/gpt-4o-mini',
-                messages: messages,
-                temperature: 0.7,
-                max_tokens: 800
-            })
+                'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+                'Content-Length': Buffer.byteLength(payload)
+            }
+        };
+
+        const apiReq = https.request(options, (apiRes) => {
+            let data = '';
+            apiRes.on('data', chunk => data += chunk);
+            apiRes.on('end', () => {
+                try {
+                    res.json(JSON.parse(data));
+                } catch (e) {
+                    res.status(500).json({ message: 'Parse error' });
+                }
+            });
         });
 
-        const data = await response.json();
-        res.json(data);
+        apiReq.on('error', (e) => {
+            res.status(500).json({ message: 'Request error', error: e.message });
+        });
+
+        apiReq.write(payload);
+        apiReq.end();
+
     } catch (error) {
         res.status(500).json({ message: 'AI error', error });
     }
