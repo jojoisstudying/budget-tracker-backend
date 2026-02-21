@@ -251,6 +251,32 @@ app.delete('/api/projects/:projectId/transactions/:transactionId', authenticateT
     }
 });
 
+// AI ROUTE
+app.post('/api/ai', authenticateToken, async (req, res) => {
+    try {
+        const { messages } = req.body;
+
+        const response = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`
+            },
+            body: JSON.stringify({
+                model: 'openai/gpt-4o-mini',
+                messages: messages,
+                temperature: 0.7,
+                max_tokens: 800
+            })
+        });
+
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ message: 'AI error', error });
+    }
+});
+
 // Test route
 app.get('/', (req, res) => {
     res.json({ message: 'Budget Tracker Backend with Auth is running!' });
