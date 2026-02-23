@@ -7,7 +7,11 @@ const jwt = require('jsonwebtoken');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: ['https://jojoisstudying.github.io', 'http://localhost:5500', 'http://127.0.0.1:5500'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://jojo:JOSHUAAJA@budget-tracker-cluster.uqrazoi.mongodb.net/?appName=budget-tracker-cluster';
